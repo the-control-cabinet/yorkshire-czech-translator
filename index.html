@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Ey Up, Ahoj! — Yorkshire ⇄ Czech phrasebook</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🫖</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Zilla+Slab:wght@500;700&family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  box-sizing: border-box;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  --bg: #e9e6ef; --panel: #ffffff; --ink: #2a2433; --muted: #6b6276;
+  --heather: #6a3d7a; --rose: #f5f2f8; --czred: #c8202f; --czblue: #11457e;
+  --line: #cfc8d8; --note: #f6f0d9;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #1c1822; --panel: #27212f; --ink: #efeaf4; --muted: #ada3b8;
+    --heather: #c79bd8; --rose: #2f2838; --czred: #ff6b74; --czblue: #8fb4ec;
+    --line: #463d52; --note: #3a3322; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #1c1822; --panel: #27212f; --ink: #efeaf4; --muted: #ada3b8;
+  --heather: #c79bd8; --rose: #2f2838; --czred: #ff6b74; --czblue: #8fb4ec;
+  --line: #463d52; --note: #3a3322; color-scheme: dark;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-padding-top: env(safe-area-inset-top, 0px); }
+body {
+  margin: 0; background: var(--bg); color: var(--ink);
+  font: 1.0625rem/1.55 "Atkinson Hyperlegible", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+main { max-width: 46rem; margin: 0 auto; padding: 2rem 1.25rem 3rem; }
+h1 {
+  font-family: "Zilla Slab", Georgia, serif; font-weight: 700;
+  font-size: clamp(2.4rem, 7vw, 4rem); line-height: 1; margin: 0 0 .5rem;
+}
+h1 .yk { color: var(--heather); }
+h1 .cz { color: var(--czblue); }
+h1 .amp { color: var(--czred); font-weight: 500; }
+.lede { color: var(--muted); margin: 0 0 1.5rem; max-width: 34rem; }
+
+.direction { display: flex; align-items: center; gap: .75rem; flex-wrap: wrap; margin-bottom: 1rem; }
+.lang { font-family: "Zilla Slab", Georgia, serif; font-weight: 700; font-size: 1.35rem; min-width: 8rem; }
+.lang.yk { color: var(--heather); }
+.lang.cz { color: var(--czblue); }
+.btn {
+  border: 2px solid var(--ink); background: var(--panel); color: var(--ink);
+  border-radius: 999px; padding: .4rem 1rem; font: inherit; font-weight: 700; cursor: pointer;
+}
+.btn:hover { background: var(--rose); }
+#swap { transition: transform .25s ease; }
+#swap.spun { transform: rotate(180deg); }
+
+/* The featured phrase: the one memorable thing on the page */
+.feature {
+  background: var(--panel); border: 1px solid var(--line); border-radius: 16px;
+  border-left: 8px solid var(--heather); padding: 1.25rem 1.35rem; margin-bottom: 1.5rem;
+}
+body.reversed .feature { border-left-color: var(--czblue); }
+.feature .from { font-family: "Zilla Slab", Georgia, serif; font-size: clamp(1.5rem, 4.5vw, 2.1rem); line-height: 1.15; font-weight: 700; margin: 0 0 .6rem; }
+.feature .to { font-size: 1.3rem; margin: 0 0 .3rem; color: var(--czblue); font-weight: 700; }
+body.reversed .feature .to { color: var(--heather); }
+.feature .meaning { color: var(--muted); margin: 0 0 .8rem; }
+.feature .note { background: var(--note); border-radius: 10px; padding: .7rem .9rem; font-size: .98rem; margin: 0 0 .9rem; }
+.feature .actions { display: flex; gap: .5rem; flex-wrap: wrap; }
+#shuffle { background: var(--czred); color: #fff; border-color: var(--czred); }
+#shuffle:hover { filter: brightness(1.08); background: var(--czred); }
+
+label.small, .small { color: var(--muted); font-size: .92rem; }
+#search {
+  width: 100%; padding: .7rem .9rem; border: 1px solid var(--line); border-radius: 10px;
+  background: var(--panel); color: var(--ink); font: inherit; margin: .3rem 0 1rem;
+}
+ul.list { list-style: none; margin: 0; padding: 0; display: grid; gap: .5rem; }
+.item {
+  width: 100%; text-align: left; background: var(--panel); border: 1px solid var(--line);
+  border-radius: 12px; padding: .75rem 1rem; color: var(--ink); font: inherit; cursor: pointer;
+  display: block;
+}
+.item:hover { border-color: var(--heather); }
+.item[aria-current="true"] { border-color: var(--heather); background: var(--rose); }
+.item .f { font-weight: 700; display: block; }
+.item .t { color: var(--muted); display: block; font-size: .95rem; }
+.empty { color: var(--muted); padding: .5rem 0; }
+
+.ai { margin-top: 2rem; background: var(--panel); border: 1px dashed var(--line); border-radius: 14px; padding: 1rem; }
+.ai[hidden] { display: none; }
+.ai h2 { font-family: "Zilla Slab", Georgia, serif; font-size: 1.2rem; margin: 0 0 .3rem; }
+.ai textarea { width: 100%; min-height: 5rem; border: 1px solid var(--line); border-radius: 8px; background: transparent; color: var(--ink); font: inherit; padding: .6rem; margin: .5rem 0; }
+#aiOut { white-space: pre-wrap; margin-top: .6rem; }
+
+button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px solid var(--heather); outline-offset: 2px; }
+footer { margin-top: 2.5rem; color: var(--muted); font-size: .85rem; }
+@media (prefers-reduced-motion: reduce) { #swap { transition: none; } }
+</style>
+</head>
+<body>
+<main>
+  <h1><span class="yk">Ey up</span><span class="amp">, </span><span class="cz">Ahoj!</span></h1>
+  <p class="lede" id="lede">The essential phrasebook for Yorkshire folk let loose in Prague. Pick a phrase, press play, and try not to start a diplomatic incident.</p>
+
+  <div class="direction">
+    <span class="lang yk" id="fromLabel">Yorkshire</span>
+    <button id="swap" class="btn" type="button" aria-label="Swap direction">⇄ Swap</button>
+    <span class="lang cz" id="toLabel">Čeština</span>
+  </div>
+
+  <section class="feature" aria-live="polite">
+    <p class="from" id="fFrom"></p>
+    <p class="to" id="fTo"></p>
+    <p class="meaning" id="fMeaning"></p>
+    <p class="note" id="fNote"></p>
+    <div class="actions">
+      <button id="speak" class="btn" type="button">🔊 Say it</button>
+      <button id="shuffle" class="btn" type="button">Another one</button>
+    </div>
+  </section>
+
+  <label class="small" for="search" id="searchLabel">Find a phrase (try “tea”, “cold” or “pub”)</label>
+  <input id="search" type="search" autocomplete="off">
+  <ul class="list" id="list"></ul>
+
+  <section class="ai" id="ai" hidden>
+    <h2>Got summat else to say?</h2>
+    <p class="small">Free-text translation, powered by Claude on your account.</p>
+    <textarea id="aiIn" placeholder="Type owt here…"></textarea>
+    <button id="aiGo" class="btn" type="button">Translate it</button>
+    <div id="aiOut"></div>
+  </section>
+
+  <footer>Phrasebook hand-picked and lovingly mangled. Flat caps not included.</footer>
+</main>
+
+<script>
+(function () {
+  // from, translation, meaning (in English), note, search tags
+  const YK = [
+    ["Ey up!", "Ahoj! / Čau!", "Hello.", "Universal Yorkshire greeting. Not a warning. Usually.", "hello hi greeting"],
+    ["Ow do?", "Jak se máš?", "How are you?", "Expected answer: “Not so bad.” Anything more enthusiastic is suspicious.", "hello how are you"],
+    ["Ey up love, fancy a brew?", "Ahoj zlato, dáš si čajík?", "Hi dear, would you like a cup of tea?", "“Love” is said to everyone, including bus drivers. “Zlato” (gold) is the Czech equivalent. Use with care.", "tea drink love brew"],
+    ["Put t’kettle on.", "Postav vodu na čaj.", "Put the kettle on.", "In Yorkshire, the answer to every crisis. Czechs will offer you a beer instead. Both are correct.", "tea kettle drink"],
+    ["Ah’m fair clemmed.", "Umírám hlady.", "I’m starving.", "Literally “I’m dying of hunger.” Czechs are just as dramatic about it.", "hungry food starving"],
+    ["Ah’m off t’pub.", "Jdu do hospody.", "I’m going to the pub.", "The hospoda is the Czech pub. You’ll feel right at home. Beer’s cheaper than water.", "pub beer drink"],
+    ["It’s a bit nippy out.", "Venku je pěkná kosa.", "It’s quite cold outside.", "“Kosa” literally means scythe, or a blackbird. Czechs say the cold cuts you. Fair.", "cold weather nippy"],
+    ["It’s black over Bill’s mother’s.", "Támhle se zatahuje, bude lejt.", "The sky looks dark over there, it’s going to rain.", "Nobody knows who Bill is or where his mother lives. Don’t ask.", "rain weather cloud"],
+    ["It’s nobbut a bit o’ drizzle.", "To je jen trochu mrholení.", "It’s only a bit of light rain.", "Said by a Yorkshireman stood in a monsoon.", "rain weather drizzle"],
+    ["Ah’m reet mafted.", "Je mi hrozné horko.", "I’m far too hot.", "Anything above 19°C, basically.", "hot weather warm"],
+    ["Tha what?", "Cože?", "Pardon? / What did you say?", "Delivered with a squint. Works identically in Czech.", "what pardon question"],
+    ["Ee by gum!", "No teda!", "Well I never! / Goodness!", "Exclamation of surprise. Ideally while dropping a pork pie.", "surprise wow"],
+    ["Gi’ over!", "Ale prosím tě!", "Stop it! / You’re joking!", "Use when someone tells you the price of a pint in London.", "stop joking"],
+    ["’Ear all, see all, say nowt.", "Mluviti stříbro, mlčeti zlato.", "Hear everything, see everything, say nothing.", "The Czech version: “Speech is silver, silence is gold.” Both nations agree you should keep it zipped.", "silence quiet proverb"],
+    ["If tha does owt for nowt, do it for thisen.", "Zadarmo ani kuře nehrabe.", "If you do anything for free, do it for yourself.", "Czech: “Even a chicken won’t scratch for free.” Tight-fisted wisdom crosses borders.", "money free proverb"],
+    ["Nowt so queer as folk.", "Lidi jsou fakt divní.", "People are very strange.", "True in Halifax, true in Brno.", "people strange proverb"],
+    ["Shut t’door, were tha born in a barn?", "Zavři, táhne!", "Close the door, there’s a draught!", "Czechs fear the draught (průvan) more than death. You’ll be best mates.", "door cold draught"],
+    ["Tha’s a reet mardy bum.", "Ty jsi ale protivnej bručoun.", "You’re very grumpy.", "“Bručoun” is a grumbler. Possibly the cuddliest insult in Czech.", "grumpy mood insult"],
+    ["Where’s tha bin?", "Kde ses toulal?", "Where have you been?", "Not a question about rubbish collection.", "where question"],
+    ["Get thisen ’ome.", "Běž domů.", "Go home.", "Used at chucking-out time in both countries.", "home go"],
+    ["Ta-ra, love!", "Tak ahoj, měj se!", "Goodbye!", "“Měj se” means “have yourself (well)”. Lovely. Much like the Yorkshire, but with fewer vowels missing.", "goodbye bye"]
+  ];
+  const CZ = [
+    ["Dáme si pivo?", "Fancy a pint, owd lad?", "Shall we have a beer?", "The most important sentence in Czech. Learn this one first.", "beer drink pub"],
+    ["Na zdraví!", "Get it down thi!", "Cheers! (literally “to health”)", "Look people in the eye when clinking, or it’s seven years of bad luck. No, really.", "cheers drink toast"],
+    ["Kde je nejbližší hospoda?", "Where’s t’nearest boozer?", "Where’s the nearest pub?", "There is always one within 200 metres. It’s the law. Probably.", "pub beer where"],
+    ["Mám hlad jako vlk.", "Ah’m fair clemmed.", "I’m as hungry as a wolf.", "Yorkshire folk are hungry as a whippet. Same thing, smaller animal.", "hungry food"],
+    ["Dobrou chuť!", "Get it etten!", "Enjoy your meal!", "Czechs say it before every meal. Yorkshire just says “’ere” and plonks the plate down.", "food meal eat"],
+    ["To je mi šumafuk.", "Ah couldn’t give a monkey’s.", "I couldn’t care less.", "“Šumafuk” is a wonderful word that sounds rude but isn’t. Use it often.", "care indifferent"],
+    ["Je tam kosa.", "It’s reet nithering out there.", "It’s freezing out there.", "Nithering: Yorkshire for “so cold your bones want a word”.", "cold weather"],
+    ["Lije jako z konve.", "It’s siling it dahn.", "It’s pouring (like from a watering can).", "Yorkshire rain, Czech rain: both come sideways.", "rain weather"],
+    ["Nemám ani korunu.", "Ah’ve not two ha’pennies to rub together.", "I haven’t got a single crown.", "The koruna is the Czech currency. The ha’penny died in 1984. Both equally useless.", "money poor broke"],
+    ["Bez práce nejsou koláče.", "Tha gets nowt for nowt.", "Without work there are no cakes.", "Czechs motivate with cake. Yorkshire motivates with disappointment.", "work proverb money"],
+    ["Kdo jinému jámu kopá, sám do ní padá.", "Them as digs ’oles fer others ends up in one thisen.", "He who digs a pit for others falls in it himself.", "Proper karma. Applies to bin day disputes too.", "proverb revenge"],
+    ["Chodit kolem horké kaše.", "Stop faffin’ abaht and spit it out.", "Walking around the hot porridge (beating about the bush).", "Yorkshire doesn’t have this problem. Yorkshire says it to your face.", "talk proverb"],
+    ["Mám toho plné zuby.", "Ah’m reet fed up wi’ it.", "I’ve had it up to my teeth with it.", "Full teeth means fed up. Makes sense if you think about it. Don’t.", "fed up annoyed"],
+    ["Pozdě bycha honit.", "No use mitherin’ now.", "It’s too late to chase “if only”.", "“Bycha” comes from “by” (would). Chasing a would-have. Very poetic for a nation that also invented ‘šumafuk’.", "late proverb"],
+    ["Ty vole!", "Bloody ’ell!", "Wow! / Dude! (literally “you ox”)", "Calling someone an ox is the Czech all-purpose exclamation. Volume determines meaning.", "wow surprise swear"],
+    ["Jdi do háje!", "Sling thi ’ook!", "Get lost! (literally “go to the grove”)", "Banished to a nice bit of woodland. Czechs are polite even when cross.", "go away insult"],
+    ["To je pecka!", "That’s champion, that!", "That’s brilliant!", "“Pecka” is a fruit stone. A cracking thing is a stone. Don’t overthink it.", "great brilliant good"],
+    ["Hezký den!", "Ta-ra, love!", "Have a nice day!", "Shop assistants will say this to you. Respond warmly, not with a Yorkshire grunt.", "goodbye bye"],
+    ["Ahoj, jak se máš?", "Ey up, ’ow do?", "Hi, how are you?", "Czechs say “ahoj” for both hello and goodbye. Sailors originally. Nobody in Czechia has a sea.", "hello greeting"]
+  ];
+
+  let reversed = false;
+  let current = 0;
+  const $ = (id) => document.getElementById(id);
+  const data = () => (reversed ? CZ : YK);
+
+  function feature(i) {
+    current = i;
+    const [from, to, meaning, note] = data()[i];
+    $("fFrom").textContent = from;
+    $("fTo").textContent = to;
+    $("fMeaning").textContent = "Meaning: " + meaning;
+    $("fNote").textContent = note;
+    document.querySelectorAll(".item").forEach((el) => el.setAttribute("aria-current", String(+el.dataset.i === i)));
+  }
+
+  function renderList() {
+    const q = $("search").value.trim().toLowerCase();
+    const list = $("list");
+    list.textContent = "";
+    let shown = 0;
+    data().forEach((row, i) => {
+      const hay = (row.join(" ")).toLowerCase();
+      if (q && !hay.includes(q)) return;
+      shown++;
+      const li = document.createElement("li");
+      const b = document.createElement("button");
+      b.type = "button"; b.className = "item"; b.dataset.i = i;
+      b.setAttribute("aria-current", String(i === current));
+      const f = document.createElement("span"); f.className = "f"; f.textContent = row[0];
+      const t = document.createElement("span"); t.className = "t"; t.textContent = row[1];
+      b.append(f, t);
+      b.onclick = () => { feature(i); window.scrollTo({ top: 0, behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" }); };
+      li.appendChild(b); list.appendChild(li);
+    });
+    if (!shown) {
+      const li = document.createElement("li"); li.className = "empty";
+      li.textContent = reversed ? "Nic takového nemáme. Try another word." : "Nowt found. Try another word.";
+      list.appendChild(li);
+    }
+  }
+
+  function random() {
+    let n; do { n = Math.floor(Math.random() * data().length); } while (n === current && data().length > 1);
+    feature(n);
+  }
+
+  function setDirection() {
+    document.body.classList.toggle("reversed", reversed);
+    $("fromLabel").textContent = reversed ? "Čeština" : "Yorkshire";
+    $("toLabel").textContent = reversed ? "Yorkshire" : "Čeština";
+    $("fromLabel").className = "lang " + (reversed ? "cz" : "yk");
+    $("toLabel").className = "lang " + (reversed ? "yk" : "cz");
+    $("lede").textContent = reversed
+      ? "Konverzační příručka pro Čechy v Yorkshiru. The essential guide for Czechs let loose in Leeds."
+      : "The essential phrasebook for Yorkshire folk let loose in Prague. Pick a phrase, press play, and try not to start a diplomatic incident.";
+    $("searchLabel").textContent = reversed ? "Find a phrase (try “pivo”, “rain” or “money”)" : "Find a phrase (try “tea”, “cold” or “pub”)";
+    $("shuffle").textContent = reversed ? "Další" : "Another one";
+    $("search").value = "";
+    renderList();
+    random();
+  }
+
+  $("swap").onclick = () => { reversed = !reversed; $("swap").classList.toggle("spun"); setDirection(); };
+  $("shuffle").onclick = random;
+  $("search").addEventListener("input", renderList);
+
+  // Text to speech: speak the Czech line (whichever side it’s on)
+  const synth = window.speechSynthesis;
+  if (!synth) { $("speak").hidden = true; }
+  $("speak").onclick = () => {
+    if (!synth) return;
+    const row = data()[current];
+    const czText = reversed ? row[0] : row[1];
+    const enText = reversed ? row[1] : row[0];
+    synth.cancel();
+    const voices = synth.getVoices();
+    const cz = new SpeechSynthesisUtterance(czText.split(" / ")[0]);
+    cz.lang = "cs-CZ";
+    const czVoice = voices.find((v) => v.lang && v.lang.toLowerCase().startsWith("cs"));
+    if (czVoice) cz.voice = czVoice;
+    const en = new SpeechSynthesisUtterance(enText);
+    en.lang = "en-GB";
+    const gbVoice = voices.find((v) => v.lang === "en-GB");
+    if (gbVoice) en.voice = gbVoice;
+    if (reversed) { synth.speak(cz); synth.speak(en); } else { synth.speak(en); synth.speak(cz); }
+  };
+
+  setDirection();
+
+  // Optional extra: free-text translation only when opened inside Claude
+  (async () => {
+    let sample = null;
+    try { if (window.claude && typeof window.claude.use === "function") sample = await window.claude.use("sample"); } catch { sample = null; }
+    if (!sample) return;
+    $("ai").hidden = false;
+    $("aiGo").onclick = async () => {
+      const text = $("aiIn").value.trim();
+      const out = $("aiOut");
+      if (!text) { out.textContent = "Tha’s not typed owt yet."; return; }
+      $("aiGo").disabled = true; out.textContent = "Brewing a translation…";
+      const dir = reversed
+        ? "from Czech into broad Yorkshire dialect English (tha, t’, nowt, summat, owt, aye)."
+        : "from Yorkshire dialect English into natural everyday Czech, using a Czech idiom where one fits better.";
+      try {
+        const res = await sample.json(
+          "Translate the text below " + dir + " Keep the meaning faithful and don't add rudeness. " +
+          "Also give one short, funny translator's note in English (max 30 words, dry Yorkshire voice). " +
+          'Reply ONLY with JSON: {"translation":"...","note":"..."}\n\nText:\n' + text,
+          { modelTier: "quick" }
+        );
+        out.textContent = (res && res.translation ? res.translation : "Came back wi’ nowt.") + (res && res.note ? "\n\n" + res.note : "");
+      } catch (e) {
+        out.textContent = e && e.code === "not_granted"
+          ? "Free-text translation needs permission to use Claude. The phrasebook above still works."
+          : "That didn’t work. The phrasebook above still works fine.";
+      } finally { $("aiGo").disabled = false; }
+    };
+  })();
+})();
+</script>
+</body>
+</html>
