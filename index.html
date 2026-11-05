@@ -96,7 +96,14 @@ ul.list { list-style: none; margin: 0; padding: 0; display: grid; gap: .5rem; }
 .ai textarea { width: 100%; min-height: 5rem; border: 1px solid var(--line); border-radius: 8px; background: transparent; color: var(--ink); font: inherit; padding: .6rem; margin: .5rem 0; }
 #aiOut { white-space: pre-wrap; margin-top: .6rem; }
 
-button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px solid var(--heather); outline-offset: 2px; }
+.ailink { margin: -0.5rem 0 1.5rem; display: flex; flex-wrap: wrap; align-items: baseline; gap: .25rem .75rem; }
+.ailink a {
+  font-family: "Zilla Slab", Georgia, serif; font-weight: 700; font-size: 1.15rem;
+  color: var(--czred); text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 3px;
+}
+.ailink a:hover { text-decoration-thickness: 3px; }
+.ailink[hidden] { display: none; }
+button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px solid var(--heather); outline-offset: 2px; }
 footer { margin-top: 2.5rem; color: var(--muted); font-size: .85rem; }
 @media (prefers-reduced-motion: reduce) { #swap { transition: none; } }
 </style>
@@ -105,6 +112,8 @@ footer { margin-top: 2.5rem; color: var(--muted); font-size: .85rem; }
 <main>
   <h1><span class="yk">Ey up</span><span class="amp">, </span><span class="cz">Ahoj!</span></h1>
   <p class="lede" id="lede">The essential phrasebook for Yorkshire folk let loose in Prague. Pick a phrase, press play, and try not to start a diplomatic incident.</p>
+
+  <p class="ailink" id="aiLink"><a href="https://claude.ai/artifact/91eVxvteLsPaj5vEezxjJV" target="_blank" rel="noopener">Click ’ere for t’AI version, it’s reet good</a><span class="small">Translates owt you type. Needs a Claude login.</span></p>
 
   <div class="direction">
     <span class="lang yk" id="fromLabel">Yorkshire</span>
@@ -162,7 +171,11 @@ footer { margin-top: 2.5rem; color: var(--muted); font-size: .85rem; }
     ["Tha’s a reet mardy bum.", "Ty jsi ale protivnej bručoun.", "You’re very grumpy.", "“Bručoun” is a grumbler. Possibly the cuddliest insult in Czech.", "grumpy mood insult"],
     ["Where’s tha bin?", "Kde ses toulal?", "Where have you been?", "Not a question about rubbish collection.", "where question"],
     ["Get thisen ’ome.", "Běž domů.", "Go home.", "Used at chucking-out time in both countries.", "home go"],
-    ["Ta-ra, love!", "Tak ahoj, měj se!", "Goodbye!", "“Měj se” means “have yourself (well)”. Lovely. Much like the Yorkshire, but with fewer vowels missing.", "goodbye bye"]
+    ["Ta-ra, love!", "Tak ahoj, měj se!", "Goodbye!", "“Měj se” means “have yourself (well)”. Lovely. Much like the Yorkshire, but with fewer vowels missing.", "goodbye bye"],
+    ["Argy-bargy", "Pěkná tahanice.", "A noisy squabble, usually with a bit of shoving.", "Standard Saturday night outside a kebab shop in Barnsley. Czechs call it a tahanice: a proper tug-of-war.", "argument fight squabble row"],
+    ["Cleveland rocks!", "Cleveland válí!", "Cleveland is brilliant! (Ian Hunter, 1979)", "Ian Hunter’s 1979 anthem for Cleveland, Ohio. Not the Cleveland up by Middlesbrough, but nobody there’s stopping you singing it. “Válí” literally means “rolls”, so it rocks and rolls.", "cleveland rocks great brilliant song ian hunter ohio"],
+    ["The Dude abides.", "Týpek to v pohodě vydrží.", "The Dude carries on, unbothered.", "For the bloke who’s been sat in his dressing gown all day. In Yorkshire, that’s just called Sunday.", "dude abides lebowski relax calm"],
+    ["So what is it?", "Tak co to je?", "So what is it? (Red Dwarf, “White Hole”, 1991)", "The Cat’s question from Red Dwarf’s “White Hole”. Kryten reckons it’s a white hole, then time goes a bit funny. In Czech you’ll hopefully only need to ask once.", "red dwarf white hole cat smeg what question"]
   ];
   const CZ = [
     ["Dáme si pivo?", "Fancy a pint, owd lad?", "Shall we have a beer?", "The most important sentence in Czech. Learn this one first.", "beer drink pub"],
@@ -252,25 +265,86 @@ footer { margin-top: 2.5rem; color: var(--muted); font-size: .85rem; }
   $("shuffle").onclick = random;
   $("search").addEventListener("input", renderList);
 
-  // Text to speech: speak the Czech line (whichever side it’s on)
+  // Speech. A Yorkshire line plays a recorded clip from audio/<slug>.mp3 if one exists.
+  // Otherwise the browser voice reads a phonetic respelling, which sounds closer to Yorkshire than the written form.
+  const SAY = {
+    "Ey up!": "Ay oop!",
+    "Ow do?": "Ow doo?",
+    "Ey up love, fancy a brew?": "Ay oop luv, fancy a broo?",
+    "Put t’kettle on.": "Putt kettle on.",
+    "Ah’m fair clemmed.": "Arm fair clemmd.",
+    "Ah’m off t’pub.": "Arm off ter poob.",
+    "It’s a bit nippy out.": "It's a bit nippy aht.",
+    "It’s black over Bill’s mother’s.": "It's black ower Bill's muther's.",
+    "It’s nobbut a bit o’ drizzle.": "It's nobbut a bit o drizzle.",
+    "Ah’m reet mafted.": "Arm reet mafted.",
+    "Tha what?": "Thah wot?",
+    "Ee by gum!": "Ee by goom!",
+    "Gi’ over!": "Gi ower!",
+    "’Ear all, see all, say nowt.": "Ear all, see all, say nowt.",
+    "If tha does owt for nowt, do it for thisen.": "If thah dooz owt fer nowt, doo it fer thi-sen.",
+    "Shut t’door, were tha born in a barn?": "Shut door, wer thah born in a barn?",
+    "Tha’s a reet mardy bum.": "Thah's a reet mardy boom.",
+    "Where’s tha bin?": "Wear's thah bin?",
+    "Get thisen ’ome.": "Get thi-sen ome.",
+    "Ta-ra, love!": "Ta-rah, luv!",
+    "So what is it?": "So wot is it?",
+    "Get it down thi!": "Get it dahn thi!",
+    "Where’s t’nearest boozer?": "Wear's ter nearest boozer?",
+    "Ah couldn’t give a monkey’s.": "Ah cooden give a monkeys.",
+    "It’s reet nithering out there.": "It's reet nithering aht theer.",
+    "Ah’ve not two ha’pennies to rub together.": "Arve not two hay-p'nies ter roob tergether.",
+    "Tha gets nowt for nowt.": "Thah gets nowt fer nowt.",
+    "Them as digs ’oles fer others ends up in one thisen.": "Them as digs oles fer others ends oop in one thi-sen.",
+    "Stop faffin’ abaht and spit it out.": "Stop faffin abaht an spit it aht.",
+    "Ah’m reet fed up wi’ it.": "Arm reet fed oop wi it.",
+    "No use mitherin’ now.": "No yuse mitherin nah.",
+    "Bloody ’ell!": "Bluddy ell!",
+    "Sling thi ’ook!": "Sling thi ook!",
+    "That’s champion, that!": "That's champion, that!",
+    "Ey up, ’ow do?": "Ay oop, ow doo?"
+  };
   const synth = window.speechSynthesis;
-  if (!synth) { $("speak").hidden = true; }
-  $("speak").onclick = () => {
-    if (!synth) return;
+  const slug = (s) => s.toLowerCase().replace(/[’']/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+  function pickVoice(prefix) {
+    const vs = synth ? synth.getVoices() : [];
+    return vs.find((v) => v.lang && v.lang.replace("_", "-").toLowerCase().startsWith(prefix));
+  }
+  function tts(text, lang, prefix) {
+    return new Promise((resolve) => {
+      if (!synth) return resolve();
+      const u = new SpeechSynthesisUtterance(text);
+      u.lang = lang;
+      const v = pickVoice(prefix);
+      if (v) u.voice = v;
+      if (lang === "en-GB") { u.rate = 0.9; u.pitch = 0.85; }
+      u.onend = u.onerror = () => resolve();
+      synth.speak(u);
+    });
+  }
+  function sayYorkshire(text) {
+    return new Promise((resolve) => {
+      let done = false;
+      const finish = () => { if (!done) { done = true; resolve(); } };
+      const fallback = () => { if (done) return; done = true; tts(SAY[text] || text, "en-GB", "en-gb").then(resolve); };
+      const a = new Audio("audio/" + slug(text) + ".mp3");
+      a.onended = finish;
+      a.onerror = fallback;
+      a.play().catch(fallback);
+    });
+  }
+  let speaking = false;
+  $("speak").onclick = async () => {
+    if (speaking) return;
+    speaking = true;
+    if (synth) synth.cancel();
     const row = data()[current];
-    const czText = reversed ? row[0] : row[1];
-    const enText = reversed ? row[1] : row[0];
-    synth.cancel();
-    const voices = synth.getVoices();
-    const cz = new SpeechSynthesisUtterance(czText.split(" / ")[0]);
-    cz.lang = "cs-CZ";
-    const czVoice = voices.find((v) => v.lang && v.lang.toLowerCase().startsWith("cs"));
-    if (czVoice) cz.voice = czVoice;
-    const en = new SpeechSynthesisUtterance(enText);
-    en.lang = "en-GB";
-    const gbVoice = voices.find((v) => v.lang === "en-GB");
-    if (gbVoice) en.voice = gbVoice;
-    if (reversed) { synth.speak(cz); synth.speak(en); } else { synth.speak(en); synth.speak(cz); }
+    const yk = reversed ? row[1] : row[0];
+    const cz = (reversed ? row[0] : row[1]).split(" / ")[0];
+    try {
+      if (reversed) { await tts(cz, "cs-CZ", "cs"); await sayYorkshire(yk); }
+      else { await sayYorkshire(yk); await tts(cz, "cs-CZ", "cs"); }
+    } finally { speaking = false; }
   };
 
   setDirection();
@@ -280,6 +354,7 @@ footer { margin-top: 2.5rem; color: var(--muted); font-size: .85rem; }
     let sample = null;
     try { if (window.claude && typeof window.claude.use === "function") sample = await window.claude.use("sample"); } catch { sample = null; }
     if (!sample) return;
+    $("aiLink").hidden = true; // already in the AI version
     $("ai").hidden = false;
     $("aiGo").onclick = async () => {
       const text = $("aiIn").value.trim();
